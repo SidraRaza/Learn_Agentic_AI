@@ -1,0 +1,19 @@
+[project]
+name = "hello-ag"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "SidraRaza", email = "160983959+SidraRaza@users.noreply.github.com" }
+]
+requires-python = ">=3.13"
+dependencies = [
+    "chainlit>=2.5.5",
+]
+
+[project.scripts]
+hello-ag = "hello_ag:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
