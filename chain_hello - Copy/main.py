@@ -1,5 +1,5 @@
 import os
-
+import chainlit as cl
 from agents import Agent, Runner, AsyncOpenAI, OpenAIChatCompletionsModel
 from agents.run import RunConfig
 from dotenv import load_dotenv  # ✅ Add this
@@ -29,8 +29,14 @@ config = RunConfig(
 )
 
 agent: Agent = Agent(name="Assistant", instructions="You are a helpful assistant", model=model)
-user_input = input("Enter your message: ")
-result = Runner.run_sync(agent, user_input, run_config=config)
 
-print("\nANSWER AGENT\n")
-print(result.final_output)
+@cl.on_message
+async def handle_message(message: cl.Message):
+    result=await Runner.run(
+        agent,
+        input=message.content,
+        run_config=config
+    )
+
+    await cl.Message(content=result.final_output).send()
+
