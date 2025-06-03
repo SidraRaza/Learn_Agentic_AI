@@ -39,4 +39,6 @@ async def handle_message(message: cl.Message):
     )
 
     await cl.Message(content=result.final_output).send()
-
+@cl.on_chat_start
+async def start():
+    await cl.Message(content="💡 *Made by Sidra Raza*").send()
