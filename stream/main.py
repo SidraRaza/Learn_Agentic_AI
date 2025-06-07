@@ -4,16 +4,17 @@ from agents import Agent, Runner, AsyncOpenAI, OpenAIChatCompletionsModel
 from agents.run import RunConfig
 from dotenv import load_dotenv  # ✅ Add this
 
+
 load_dotenv()
  
-gemini_api_key = os.getenv("GEMINI_API_KEY")
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 # Check if the API key is present; if not, raise an error
-if not gemini_api_key:
+if not GEMINI_API_KEY:
     raise ValueError("GEMINI_API_KEY is not set. Please ensure it is defined in your .env file.")
 
 #Reference: https://ai.google.dev/gemini-api/docs/openai
 external_client = AsyncOpenAI(
-    api_key=gemini_api_key,
+    api_key=GEMINI_API_KEY,
     base_url="https://generativelanguage.googleapis.com/v1beta/openai/",
 )
 
@@ -28,7 +29,18 @@ config = RunConfig(
     tracing_disabled=True
 )
 
-agent: Agent = Agent(name="Assistant", instructions="You are a helpful assistant", model=model)
+async def main():
+    agent = Agent(
+        name="Joker",
+        instructions="You are a helpful assistant.",
+
+    )
+
+async def main():
+    result = Runner.run_streamed(agent, input="Please tell me 5 jokes.")
+    async for event in result.stream_events():
+        if event.type == "raw_response_event" and isinstance(event.data, ResponseTextDeltaEvent):
+            print(event.data.delta, end="", flush=True)
 
 
 # message handler user list 
@@ -37,7 +49,7 @@ async def start():
     cl.user_session.set("history", [])
     await cl.Message(content="Maintain a conversation with me").send()
 @cl.on_message
-async def handle_message(message: cl.Message):
+async def handle_message(message: cl.Message):  
     history = cl.user_session.get("history")
     history.append({"role": "user", "content": message.content})
     cl.user_session.set("history", history)
@@ -48,6 +60,6 @@ async def handle_message(message: cl.Message):
     )
 
     await cl.Message(content=result.final_output).send()
-# @cl.on_chat_start
-# async def start():
-#     await cl.Message(content="💡 *Made by Sidra Raza*").send()
+@cl.on_chat_start
+async def start():
+    await cl.Message(content="💡 *Made by Sidra Raza*").send()
