@@ -1,8 +1,9 @@
 import os
 import chainlit as cl
-from agents import Agent, Runner, AsyncOpenAI, OpenAIChatCompletionsModel
+from agents import Agent, Runner, AsyncOpenAI, OpenAIChatCompletionsModel 
 from agents.run import RunConfig
 from dotenv import load_dotenv  # ✅ Add this
+from openai.types.responses import ResponseTextDeltaEvent
 
 
 load_dotenv()
@@ -28,13 +29,7 @@ config = RunConfig(
     model_provider=external_client,
     tracing_disabled=True
 )
-
-async def main():
-    agent = Agent(
-        name="Joker",
-        instructions="You are a helpful assistant.",
-
-    )
+agent=Agent(name="Assistant",instructions="helper",model=model)
 
 async def main():
     result = Runner.run_streamed(agent, input="Please tell me 5 jokes.")
@@ -53,13 +48,21 @@ async def handle_message(message: cl.Message):
     history = cl.user_session.get("history")
     history.append({"role": "user", "content": message.content})
     cl.user_session.set("history", history)
-    result=await Runner.run(
+
+    result = Runner.run_streamed(
         agent,
         input=history,
         run_config=config
     )
 
-    await cl.Message(content=result.final_output).send()
-@cl.on_chat_start
-async def start():
-    await cl.Message(content="💡 *Made by Sidra Raza*").send()
+    msg = cl.Message(content="")
+    await msg.send()  # Send an initial empty message for streaming
+
+    async for event in result.stream_events():
+        if event.type == "raw_response_event" and isinstance(event.data, ResponseTextDeltaEvent):
+            msg.content += event.data.delta
+            await msg.update()
+
+# @cl.on_chat_start
+# async def start():
+#     await cl.Message(content="💡 *Made by Sidra Raza*").send()
