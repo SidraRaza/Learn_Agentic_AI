@@ -31,11 +31,11 @@ config = RunConfig(
 )
 agent=Agent(name="Assistant",instructions="helper",model=model)
 
-async def main():
-    result = Runner.run_streamed(agent, input="Please tell me 5 jokes.")
-    async for event in result.stream_events():
-        if event.type == "raw_response_event" and isinstance(event.data, ResponseTextDeltaEvent):
-            print(event.data.delta, end="", flush=True)
+# async def main():
+#     result = Runner.run_streamed(agent, input="Please tell me 5 jokes.")
+#     async for event in result.stream_events():
+#         if event.type == "raw_response_event" and isinstance(event.data, ResponseTextDeltaEvent):
+#             print(event.data.delta, end="", flush=True)
 
 
 # message handler user list 
@@ -60,8 +60,8 @@ async def handle_message(message: cl.Message):
 
     async for event in result.stream_events():
         if event.type == "raw_response_event" and isinstance(event.data, ResponseTextDeltaEvent):
-            msg.content += event.data.delta
-            await msg.update()
+            token = event.data.delta
+            await msg.stream_token(token)
 
 # @cl.on_chat_start
 # async def start():
