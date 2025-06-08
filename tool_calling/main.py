@@ -4,6 +4,7 @@ from agents import Agent, Runner, AsyncOpenAI, OpenAIChatCompletionsModel
 from agents.run import RunConfig
 from dotenv import load_dotenv  # ✅ Add this
 from openai.types.responses import ResponseTextDeltaEvent
+from agents.tool import function_tool
 
 
 load_dotenv()
@@ -29,7 +30,15 @@ config = RunConfig(
     model_provider=external_client,
     tracing_disabled=True
 )
-agent=Agent(name="Assistant",instructions="helper",model=model)
+
+@function_tool("get_weather")
+def get_weather(location: str) -> str:
+  """
+  Fetch the weather for a given location, returning a short description.
+  """
+  # Example logic
+  return f"The weather in {location} is 22 degrees C."
+agent=Agent(name="Assistant",instructions="helper",tools=[get_weather],model=model)
 
 # async def main():
 #     result = Runner.run_streamed(agent, input="Please tell me 5 jokes.")
@@ -39,6 +48,8 @@ agent=Agent(name="Assistant",instructions="helper",model=model)
 
 
 # message handler user list 
+
+
 @cl.on_chat_start
 async def start():
     cl.user_session.set("history", [])
