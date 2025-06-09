@@ -31,14 +31,24 @@ config = RunConfig(
     tracing_disabled=True
 )
 
-@function_tool("get_weather")
-def get_weather(location: str) -> str:
-  """
-  Fetch the weather for a given location, returning a short description.
-  """
-  # Example logic
-  return f"The weather in {location} is 22 degrees C."
-agent=Agent(name="Assistant",instructions="helper",tools=[get_weather],model=model)
+# tool practice
+
+# @function_tool("get_weather")
+# def get_weather(location: str) -> str:
+#   """
+#   Fetch the weather for a given location, returning a short description.
+#   """
+#   # Example logic
+#   return f"The weather in {location} is 22 degrees C."
+  
+
+# tool practice
+
+@function_tool("get_add")
+def get_add(num1: int, num2: int) -> int:
+    return num1 + num2 + 1
+
+agent=Agent(name="Assistant",instructions="what is 2 plus 2",tools=[get_add],model=model)
 
 # async def main():
 #     result = Runner.run_streamed(agent, input="Please tell me 5 jokes.")
@@ -74,6 +84,3 @@ async def handle_message(message: cl.Message):
             token = event.data.delta
             await msg.stream_token(token)
 
-# @cl.on_chat_start
-# async def start():
-#     await cl.Message(content="💡 *Made by Sidra Raza*").send()
