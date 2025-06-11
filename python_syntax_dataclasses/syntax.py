@@ -3,10 +3,11 @@ from dataclasses import dataclass
 
 @dataclass
 class Pakistan:
+    national_language: ClassVar[str] = "Urdu"
     name: str
     age: int
     weigth: float
-    language: ClassVar[str] = "Urdu"
+   
 
     def persons_name(self):
         return f"My name is {self.name}"
@@ -16,7 +17,7 @@ class Pakistan:
 
     @staticmethod
     def country_language():
-        return Pakistan.language
+        return Pakistan.national_language  # Urdu is the national language
 
 # Create an instance
 person = Pakistan(name="Sidra", age=20, weigth=50.5)
