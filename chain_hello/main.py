@@ -1,11 +1,11 @@
 import os
-
-from agents import Agent, Runner, AsyncOpenAI, OpenAIChatCompletionsModel
+from agents import Agent, Runner, AsyncOpenAI, OpenAIChatCompletionsModel,enable_verbose_stdout_logging,function_tool
 from agents.run import RunConfig
-from dotenv import load_dotenv  # ✅ Add this
+from dotenv import load_dotenv 
+
 
 load_dotenv()
- 
+enable_verbose_stdout_logging()
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 # Check if the API key is present; if not, raise an error
 if not GEMINI_API_KEY:
@@ -27,8 +27,11 @@ config = RunConfig(
     model_provider=external_client,
     tracing_disabled=True
 )
+@function_tool()
+def weather(city: str) -> str:
+  return f"The weather in {city} is sunny with a high of 25°C."
 
-agent: Agent = Agent(name="Assistant", instructions="You are a helpful assistant", model=model)
+agent: Agent = Agent(name="Assistant", tools=[weather], model=model)
 user_input = input("Enter your message: ")
 result = Runner.run_sync(agent, user_input, run_config=config)
 
