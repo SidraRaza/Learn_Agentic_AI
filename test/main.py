@@ -9,7 +9,7 @@ gemini_api_key = os.getenv("GEMINI_API_KEY")
 if gemini_api_key is None:
     raise ValueError("GEMINI_API_KEY environment variable is not set.")
 
-
+# 333333
 #Reference: https://ai.google.dev/gemini-api/docs/openai
 external_client = AsyncOpenAI(
     api_key=gemini_api_key,
