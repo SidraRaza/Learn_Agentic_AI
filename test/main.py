@@ -1,4 +1,4 @@
-from agents import Agent, Runner, AsyncOpenAI, OpenAIChatCompletionsModel
+from agents import Agent, Runner, AsyncOpenAI, OpenAIChatCompletionsModel, function_tool
 from agents.run import RunConfig
 import os
 from dotenv import load_dotenv 
@@ -27,8 +27,20 @@ config = RunConfig(
     tracing_disabled=True
 )
 
-agent: Agent = Agent(name="Assistant", instructions="You are a helpful assistant")
 
-result = Runner.run_sync(agent, "who is the founder of pakistan.", run_config=config)
+@function_tool
+def get_weather(location: str) -> str:
+    """Get the current weather for a given location."""
+    return f"The current weather in {location} is sunny with a high of 25°C."
+
+
+@function_tool
+def get_add_items(item1: str, item2: str) -> str:
+    """Add two items."""
+    return f"The sum of {item1} and {item2} is {int(item1) + int(item2)}."
+
+agent: Agent = Agent(name="Assistant", instructions="You are a helpful assistant",tools=[get_weather, get_add_items])
+
+result = Runner.run_sync(agent, "What is 2 - 4", run_config=config)
 
 print(result.final_output)
